@@ -1,21 +1,40 @@
 // material-ui
-import { Slider, Typography } from '@mui/material';
+import { Button, Slider, Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useState } from 'react';
 import MainCard from 'ui-component/cards/MainCard';
 
 // project imports
 // ==============================|| SAMPLE PAGE ||============================== //
 
-function valuetext(value) {
-    return `${value}°C`;
-}
-
 const ImportancePreferences = () => {
-    const [value, setValue] = React.useState([0, 0]);
+    const importanceInit = {
+        'temperature, pressure': [-9, 9],
+        'temperature, humidity': [-9, 9],
+        'temperature, light': [-9, 9],
+        'pressure, humidity': [-9, 9],
+        'pressure, light': [-9, 9],
+        'humidity, light': [-9, 9]
+    };
+    const [importance, setImportance] = useState(importanceInit);
 
-    const handleChange = (event, newValue) => {
-        setValue(newValue);
+    const handleImportanceChange = (key, newValue) => {
+        // Disable change on some situations
+        if (newValue.includes(0) || newValue[0] > 0 || newValue[1] < 0) return false;
+
+        setImportance({ ...importance, [key]: newValue });
+    };
+
+    const handleImportanceSave = () => {
+        let importanceServerData = {};
+        for (const key of Object.keys(importance)) {
+            const value = importance[key];
+            importanceServerData[key] = Math.abs(value[0] / value[1]);
+        }
+
+        // @TODO: save to the server
+        console.log(importanceServerData);
     };
 
     return (
@@ -26,10 +45,9 @@ const ImportancePreferences = () => {
                 </Typography>
                 <Slider
                     getAriaLabel={() => 'Temperature Pressure Importance'}
-                    value={value}
-                    onChange={handleChange}
+                    value={importance['temperature, pressure']}
+                    onChange={(_, newValue) => handleImportanceChange('temperature, pressure', newValue)}
                     valueLabelDisplay="auto"
-                    getAriaValueText={valuetext}
                     min={-9}
                     max={9}
                 />
@@ -40,10 +58,9 @@ const ImportancePreferences = () => {
                 </Typography>
                 <Slider
                     getAriaLabel={() => 'Temperature Humidity Importance'}
-                    value={value}
-                    onChange={handleChange}
+                    value={importance['temperature, humidity']}
+                    onChange={(_, newValue) => handleImportanceChange('temperature, humidity', newValue)}
                     valueLabelDisplay="auto"
-                    getAriaValueText={valuetext}
                     min={-9}
                     max={9}
                 />
@@ -54,10 +71,9 @@ const ImportancePreferences = () => {
                 </Typography>
                 <Slider
                     getAriaLabel={() => 'Temperature Light Importance'}
-                    value={value}
-                    onChange={handleChange}
+                    value={importance['temperature, light']}
+                    onChange={(_, newValue) => handleImportanceChange('temperature, light', newValue)}
                     valueLabelDisplay="auto"
-                    getAriaValueText={valuetext}
                     min={-9}
                     max={9}
                 />
@@ -68,10 +84,9 @@ const ImportancePreferences = () => {
                 </Typography>
                 <Slider
                     getAriaLabel={() => 'Pressure Humidity Importance'}
-                    value={value}
-                    onChange={handleChange}
+                    value={importance['pressure, humidity']}
+                    onChange={(_, newValue) => handleImportanceChange('pressure, humidity', newValue)}
                     valueLabelDisplay="auto"
-                    getAriaValueText={valuetext}
                     min={-9}
                     max={9}
                 />
@@ -82,10 +97,9 @@ const ImportancePreferences = () => {
                 </Typography>
                 <Slider
                     getAriaLabel={() => 'Pressure Light Importance'}
-                    value={value}
-                    onChange={handleChange}
+                    value={importance['pressure, light']}
+                    onChange={(_, newValue) => handleImportanceChange('pressure, light', newValue)}
                     valueLabelDisplay="auto"
-                    getAriaValueText={valuetext}
                     min={-9}
                     max={9}
                 />
@@ -94,13 +108,18 @@ const ImportancePreferences = () => {
                 <Typography variant="h4">Humidity - Light</Typography>
                 <Slider
                     getAriaLabel={() => 'Humidity Light Importance'}
-                    value={value}
-                    onChange={handleChange}
+                    value={importance['humidity, light']}
+                    onChange={(_, newValue) => handleImportanceChange('humidity, light', newValue)}
                     valueLabelDisplay="auto"
-                    getAriaValueText={valuetext}
                     min={-9}
                     max={9}
                 />
+            </Box>
+
+            <Box textAlign="center">
+                <Button variant="contained" onClick={handleImportanceSave}>
+                    Save
+                </Button>
             </Box>
         </MainCard>
     );
