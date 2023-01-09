@@ -1,24 +1,22 @@
-import PropTypes from 'prop-types';
-
-// material-ui
-import { styled, useTheme } from '@mui/material/styles';
+/* eslint-disable */
+import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
 import {
     Avatar,
     Card,
     CardContent,
     Grid,
     LinearProgress,
+    linearProgressClasses,
     List,
     ListItem,
     ListItemAvatar,
-    ListItemText,
     Typography,
-    linearProgressClasses
 } from '@mui/material';
+import { styled, useTheme } from '@mui/material/styles';
+import PropTypes from 'prop-types';
 
+// material-ui
 // assets
-import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
-
 // styles
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
     height: 10,
@@ -105,15 +103,6 @@ const MenuCard = () => {
                                 <TableChartOutlinedIcon fontSize="inherit" />
                             </Avatar>
                         </ListItemAvatar>
-                        <ListItemText
-                            sx={{ mt: 0 }}
-                            primary={
-                                <Typography variant="subtitle1" sx={{ color: theme.palette.primary[800] }}>
-                                    Get Extra Space
-                                </Typography>
-                            }
-                            secondary={<Typography variant="caption"> 28/23 GB</Typography>}
-                        />
                     </ListItem>
                 </List>
                 <LinearProgressWithLabel value={80} />

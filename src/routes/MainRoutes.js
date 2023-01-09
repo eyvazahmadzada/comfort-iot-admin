@@ -1,6 +1,7 @@
 import MainLayout from 'layout/MainLayout';
 import { lazy } from 'react';
 import Loadable from 'ui-component/Loadable';
+import Rooms from 'views/rooms';
 
 // project imports
 // dashboard routing
@@ -30,10 +31,18 @@ const MainRoutes = {
             path: 'dashboard',
             children: [
                 {
-                    path: 'default',
+                    path: '',
                     element: <DashboardDefault />
                 }
             ]
+        },
+        {
+            path: 'importance-preferences',
+            element: <SamplePage />
+        },
+        {
+            path: 'rooms',
+            element: <Rooms />
         },
         {
             path: 'utils',
@@ -79,10 +88,6 @@ const MainRoutes = {
                     element: <UtilsMaterialIcons />
                 }
             ]
-        },
-        {
-            path: 'importance-preferences',
-            element: <SamplePage />
         }
     ]
 };
