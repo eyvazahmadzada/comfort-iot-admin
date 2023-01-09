@@ -6,6 +6,8 @@ from bson.errors import InvalidId
 import json
 from pymongo import MongoClient
 import datetime
+from itertools import combinations
+import ahpy
 
 app = Flask(__name__)
 api = Api(app)
@@ -20,6 +22,16 @@ parser = reqparse.RequestParser()
 
 class ROOMS(Resource):
     def get(self):
+
+        # @TODO: we need to add AHP importance filtering based on user preference
+        # So, just another parameter AHPObj would be enough:
+        # AHPObj: {
+            # 'temperature, humidity': 0.2,
+            # 'temperature', pressure': 3,
+            # ...
+        # }
+
+        # This 
 
         ROOMS_OBJECT = {}
 
@@ -155,6 +167,77 @@ def averageValues():
             'pressure': pressure_sum / count
         }
     return averages
+
+class AHPImportance(Resource):
+    def get(self):
+        print('some code')
+        # @TODO Need to create a table for AHP importance in DB
+        # It should basically store this object:
+        # AHPObj: {
+            # 'temperature, humidity': 0.2,
+            # 'temperature', pressure': 3,
+        # }
+
+    def put(self, updatedAHPObj):
+        print('some code')
+        # @TODO updatedImportance is also an object - same type as AHPObj
+
+def calculateAHPOrder(AHPObj):
+    # AHPObj format same as above
+    # @TODO: AHPObj needs to be converted to the following format (object key: tuples, value: float):
+    # {
+    #   ('Temperature', 'Humidity'): 0.2,
+        # ('Temperature', 'Pressure'): 3,
+        # ('Temperature', 'Light'): 7,
+        # ('Humidity', 'Pressure'): 4,
+        # ('Humidity', 'Light'): 0.3333333333333333,
+        # ('Pressure', 'Light'): 2
+    # }
+
+    rooms = ['room_106', 'room_108', 'room_215', 'room_104']
+    room_pairs = list(combinations(rooms, 2))
+    # room_pairs returns:
+        # [('room_106', 'room_108'),
+        # ('room_106', 'room_215'),
+        # ('room_106', 'room_104'),
+        # ('room_108', 'room_215'),
+        # ('room_108', 'room_104'),
+        # ('room_215', 'room_104')]
+
+    # These are dummy data, and they represent importance for each pair:
+    # ('room_106', 'room_108'): 1/5
+    # ('room_106', 'room_215'): 3
+    # ...
+    temperature_values = [1/5, 3, 7, 4, 1/3, 2]
+    humidity_values = [1/3, 4, 8, 1, 1/2, 3]
+    pressure_values = [1/5, 7, 7, 2, 1/3, 2]
+    light_values = [1/5, 3, 6, 4, 1/3, 5]
+
+    # So how do we calculate them?
+    # 1. Get average parameter value (temp, humidity, pressure...) for each room in the last 24h
+    # 2. Divide values for pairs by each other.
+    # So if temp is 5 for room_106 and 25 for room_108, ('room_106', 'room_108') will be 1/5 (5/25) - 0.2
+
+    temperature_comparisons = dict(zip(room_pairs, temperature_values))
+    humidity_comparisons = dict(zip(room_pairs, humidity_values))
+    pressure_comparisons = dict(zip(room_pairs, pressure_values))
+    light_comparisons = dict(zip(room_pairs, light_values))
+
+    temperature = ahpy.Compare('Temperature', temperature_comparisons, precision=3, random_index='saaty')
+    humidity = ahpy.Compare('Humidity', humidity_comparisons, precision=3, random_index='saaty')
+    pressure = ahpy.Compare('Pressure', pressure_comparisons, precision=3, random_index='saaty')
+    light = ahpy.Compare('Light', light_comparisons, precision=3, random_index='saaty')
+    criteria = ahpy.Compare('Criteria', criteria_comparisons, precision=3, random_index='saaty')
+
+    criteria.add_children([temperature, humidity, pressure, light])
+
+    print(criteria.target_weights)
+    # {'room_106': 0.344, 'room_108': 0.335, 'room_104': 0.178, 'room_215': 0.144}
+
+    # After getting the value of criteria.target_weights, we just need to sort rooms by value (descending):
+    # room_108, room_106, room_104, room_215 - this is the end result of the calculation
+
+
 
 
 api.add_resource(ROOMS, '/rooms')
