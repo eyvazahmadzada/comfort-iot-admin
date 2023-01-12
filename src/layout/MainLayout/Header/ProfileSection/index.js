@@ -16,12 +16,14 @@ import {
 import { useTheme } from '@mui/material/styles';
 import { IconLogout, IconSettings } from '@tabler/icons';
 import User1 from 'assets/images/users/user-round.svg';
+import { AUTH_TOKEN_KEY } from 'constants/config';
 import { useEffect, useRef, useState } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import MainCard from 'ui-component/cards/MainCard';
 import Transitions from 'ui-component/extended/Transitions';
+import Cookie from 'utils/Cookie';
 
 // material-ui
 // third-party
@@ -34,9 +36,6 @@ const ProfileSection = () => {
     const customization = useSelector((state) => state.customization);
     const navigate = useNavigate();
 
-    const [sdm, setSdm] = useState(true);
-    const [value, setValue] = useState('');
-    const [notification, setNotification] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(-1);
     const [open, setOpen] = useState(false);
     /**
@@ -44,7 +43,8 @@ const ProfileSection = () => {
      * */
     const anchorRef = useRef(null);
     const handleLogout = async () => {
-        console.log('Logout');
+        Cookie.delete(AUTH_TOKEN_KEY);
+        navigate('/login');
     };
 
     const handleClose = (event) => {

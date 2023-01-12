@@ -10,14 +10,16 @@ import {
     InputAdornment,
     InputLabel,
     OutlinedInput,
-    useMediaQuery,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import appService from 'api/services/app.service';
+import { AUTH_TOKEN_KEY } from 'constants/config';
 import { Formik } from 'formik';
 import useScriptRef from 'hooks/useScriptRef';
 import { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router';
 import AnimateButton from 'ui-component/extended/AnimateButton';
+import Cookie from 'utils/Cookie';
 import * as Yup from 'yup';
 
 /* eslint-disable */
@@ -30,13 +32,7 @@ import * as Yup from 'yup';
 const FirebaseLogin = ({ ...others }) => {
     const theme = useTheme();
     const scriptedRef = useScriptRef();
-    const matchDownSM = useMediaQuery(theme.breakpoints.down('md'));
-    const customization = useSelector((state) => state.customization);
-    const [checked, setChecked] = useState(true);
-
-    const googleHandler = async () => {
-        console.error('Login');
-    };
+    const navigate = useNavigate();
 
     const [showPassword, setShowPassword] = useState(false);
     const handleClickShowPassword = () => {
@@ -51,8 +47,8 @@ const FirebaseLogin = ({ ...others }) => {
         <>
             <Formik
                 initialValues={{
-                    email: 'info@codedthemes.com',
-                    password: '123456',
+                    email: 'genial@admin.com',
+                    password: 'iotproject',
                     submit: null
                 }}
                 validationSchema={Yup.object().shape({
@@ -60,18 +56,15 @@ const FirebaseLogin = ({ ...others }) => {
                     password: Yup.string().max(255).required('Password is required')
                 })}
                 onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
-                    try {
-                        if (scriptedRef.current) {
-                            setStatus({ success: true });
-                            setSubmitting(false);
-                        }
-                    } catch (err) {
-                        console.error(err);
-                        if (scriptedRef.current) {
-                            setStatus({ success: false });
-                            setErrors({ submit: err.message });
-                            setSubmitting(false);
-                        }
+                    const loginRes = await appService.login({ email: values.email, password: values.password });
+
+                    if (loginRes.data.token) {
+                        var now = new Date();
+                        var expDate = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24 hours
+                        Cookie.set(AUTH_TOKEN_KEY, loginRes.data.token, expDate);
+                        navigate('/');
+                    } else {
+                        setErrors({ submit: err.message });
                     }
                 }}
             >

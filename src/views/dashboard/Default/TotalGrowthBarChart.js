@@ -1,6 +1,6 @@
-import { Grid, MenuItem, TextField, Typography } from '@mui/material';
+import { Grid, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import ApexCharts from 'apexcharts';
+import appService from 'api/services/app.service';
 import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 import Chart from 'react-apexcharts';
@@ -33,7 +33,8 @@ const status = [
 // ==============================|| DASHBOARD DEFAULT - TOTAL GROWTH BAR CHART ||============================== //
 
 const TotalGrowthBarChart = ({ isLoading }) => {
-    const [value, setValue] = useState('today');
+    const [averageValues, setAverageValues] = useState(null);
+    const [chartDataMain, setChartDataMain] = useState(null);
     const theme = useTheme();
     const customization = useSelector((state) => state.customization);
 
@@ -49,41 +50,68 @@ const TotalGrowthBarChart = ({ isLoading }) => {
     const secondaryLight = theme.palette.secondary.light;
 
     useEffect(() => {
-        const newChartData = {
-            ...chartData.options,
-            colors: [primary200, primaryDark, secondaryMain, secondaryLight],
-            xaxis: {
-                labels: {
-                    style: {
-                        colors: [primary, primary, primary, primary, primary, primary, primary, primary, primary, primary, primary, primary]
-                    }
-                }
-            },
-            yaxis: {
-                labels: {
-                    style: {
-                        colors: [primary]
-                    }
-                }
-            },
-            grid: {
-                borderColor: grey200
-            },
-            tooltip: {
-                theme: 'light'
-            },
-            legend: {
-                labels: {
-                    colors: grey500
-                }
-            }
+        const getAverageValues = async () => {
+            const averageValues = await appService.getAverageValues();
+            setAverageValues(averageValues);
         };
 
-        // do not load chart when loading
-        if (!isLoading) {
-            ApexCharts.exec(`bar-chart`, 'updateOptions', newChartData);
+        getAverageValues();
+    }, []);
+
+    useEffect(() => {
+        if (averageValues) {
+            const updatedChartData = { ...chartData };
+            updatedChartData.options.xaxis.categories = Object.keys(averageValues);
+            updatedChartData.series = [
+                { name: 'Pressure kPa', data: Object.values(averageValues).map((item) => item.pressure / 1000) },
+                { name: 'Temperature °C', data: Object.values(averageValues).map((item) => item.temperature) },
+                { name: 'Humidity ', data: Object.values(averageValues).map((item) => item.humidity) },
+                { name: 'Light', data: Object.values(averageValues).map((item) => item.light) }
+            ];
+
+            setChartDataMain(updatedChartData);
         }
-    }, [navType, primary200, primaryDark, secondaryMain, secondaryLight, primary, darkLight, grey200, isLoading, grey500]);
+    }, [averageValues]);
+
+    useEffect(() => {
+        if (chartDataMain) {
+            const newChartData = {
+                ...chartData.options,
+                colors: [secondaryMain, primary200, primaryDark, secondaryLight],
+                xaxis: {
+                    labels: {
+                        style: {
+                            colors: [primary, primary, primary, primary]
+                        }
+                    }
+                },
+                yaxis: {
+                    labels: {
+                        style: {
+                            colors: [primary, primary, primary, primary]
+                        },
+                        formatter: (value) => (+value).toFixed(1)
+                    }
+                },
+                grid: {
+                    borderColor: grey200
+                },
+                tooltip: {
+                    theme: 'light'
+                },
+                legend: {
+                    labels: {
+                        colors: grey500
+                    }
+                }
+            };
+
+            // do not load chart when loading
+            if (!isLoading) {
+                ApexCharts.exec(`bar-chart`, 'updateOptions', newChartData);
+            }
+        }
+    }, [chartDataMain, navType, primary200, primaryDark, secondaryMain, secondaryLight, primary, darkLight, grey200, isLoading, grey500]);
 
     return (
         <>
@@ -100,28 +128,14 @@ const TotalGrowthBarChart = ({ isLoading }) => {
                                             <Typography variant="subtitle2">Number of rooms</Typography>
                                         </Grid>
                                         <Grid item>
-                                            <Typography variant="h3">10</Typography>
+                                            <Typography variant="h3">4</Typography>
                                         </Grid>
                                     </Grid>
-                                </Grid>
-                                <Grid item>
-                                    <TextField
-                                        id="standard-select-currency"
-                                        select
-                                        value={value}
-                                        onChange={(e) => setValue(e.target.value)}
-                                    >
-                                        {status.map((option) => (
-                                            <MenuItem key={option.value} value={option.value}>
-                                                {option.label}
-                                            </MenuItem>
-                                        ))}
-                                    </TextField>
                                 </Grid>
                             </Grid>
                         </Grid>
                         <Grid item xs={12}>
-                            <Chart {...chartData} />
+                            {chartDataMain && <Chart {...chartDataMain} />}
                         </Grid>
                     </Grid>
                 </MainCard>

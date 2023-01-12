@@ -1,30 +1,11 @@
 // material-ui
-import { useTheme, styled } from '@mui/material/styles';
-import {
-    Avatar,
-    Button,
-    Card,
-    CardContent,
-    Chip,
-    Divider,
-    Grid,
-    List,
-    ListItem,
-    ListItemAvatar,
-    ListItemSecondaryAction,
-    ListItemText,
-    Stack,
-    Typography
-} from '@mui/material';
+import { Divider, List } from '@mui/material';
+import { styled, useTheme } from '@mui/material/styles';
+
+import HumidityLineAreaGraph from './HumidityLineAreaGraph';
 
 // assets
-import { IconBrandTelegram, IconBuildingStore, IconMailbox, IconPhoto } from '@tabler/icons';
-import User1 from 'assets/images/users/user-round.svg';
-
 //import projects
-import TotalGrowthBarChart from '../TotalGrowthBarChart';
-import TemperatureLineAreaGraph from './TemperatureLineAreaGraph';
-import HumidityLineAreaGraph from './HumidityLineAreaGraph';
 // styles
 const ListItemWrapper = styled('div')(({ theme }) => ({
     cursor: 'pointer',
@@ -39,32 +20,8 @@ const ListItemWrapper = styled('div')(({ theme }) => ({
 
 // ==============================|| NOTIFICATION LIST ITEM ||============================== //
 
-const Graphs = () => {
+const Graphs = ({ chart }) => {
     const theme = useTheme();
-
-    const chipSX = {
-        height: 24,
-        padding: '0 6px'
-    };
-    const chipErrorSX = {
-        ...chipSX,
-        color: theme.palette.orange.dark,
-        backgroundColor: theme.palette.orange.light,
-        marginRight: '5px'
-    };
-
-    const chipWarningSX = {
-        ...chipSX,
-        color: theme.palette.warning.dark,
-        backgroundColor: theme.palette.warning.light
-    };
-
-    const chipSuccessSX = {
-        ...chipSX,
-        color: theme.palette.success.dark,
-        backgroundColor: theme.palette.success.light,
-        height: 28
-    };
 
     return (
         <List
@@ -88,7 +45,7 @@ const Graphs = () => {
             }}
         >
             <ListItemWrapper>
-                <HumidityLineAreaGraph />
+                <HumidityLineAreaGraph chart={chart} />
             </ListItemWrapper>
             <Divider />
         </List>

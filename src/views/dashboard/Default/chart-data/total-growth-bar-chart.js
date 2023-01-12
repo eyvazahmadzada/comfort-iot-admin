@@ -6,7 +6,7 @@ const chartData = {
     options: {
         chart: {
             id: 'bar-chart',
-            stacked: true,
+            stacked: false,
             toolbar: {
                 show: true
             },
@@ -34,8 +34,9 @@ const chartData = {
         },
         xaxis: {
             type: 'category',
-            categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+            categories: []
         },
+
         legend: {
             show: true,
             fontSize: '14px',
@@ -75,7 +76,7 @@ const chartData = {
             data: [35, 15, 15, 35, 65, 40, 80, 25, 15, 85, 25, 75]
         },
         {
-            name: 'Pressure',
+            name: 'Pressure (kPa)',
             data: [35, 145, 35, 35, 20, 105, 100, 10, 65, 45, 30, 10]
         },
         {

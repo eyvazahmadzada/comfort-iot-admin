@@ -1,6 +1,7 @@
 // material-ui
 import { useTheme } from '@emotion/react';
 import { Divider, Grid, Typography } from '@mui/material';
+import appService from 'api/services/app.service';
 import React, { useEffect } from 'react';
 import { useState } from 'react';
 import MainCard from 'ui-component/cards/MainCard';
@@ -23,6 +24,7 @@ const Rooms = () => {
     };
     const [importance, setImportance] = useState(importanceInit);
     const theme = useTheme();
+    const [rooms, setRooms] = useState(null);
 
     const handleImportanceChange = (key, newValue) => {
         // Disable change on some situations
@@ -41,6 +43,17 @@ const Rooms = () => {
         // @TODO: save to the server
         console.log(importanceServerData);
     };
+
+    useEffect(() => {
+        const getRooms = async () => {
+            const rooms = await appService.getRooms();
+            setRooms(rooms);
+        };
+
+        getRooms();
+    }, []);
+
+    console.log(rooms);
 
     return (
         <MainCard title="Rooms">
@@ -83,231 +96,56 @@ const Rooms = () => {
                     </Grid>
                 </Grid>
                 <Divider sx={{ my: 1.5 }} />
-                <Grid container direction="column">
-                    <Grid item>
-                        <Grid container alignItems="center" justifyContent="space-between">
-                            <Grid item>
-                                <Typography variant="subtitle1" color="inherit">
-                                    Room 1
-                                </Typography>
-                            </Grid>
-                            <Grid item>
-                                <Typography variant="subtitle1" color="inherit">
-                                    1
-                                </Typography>
-                            </Grid>
-                            <Grid item>
-                                <Typography variant="subtitle1" color="inherit">
-                                    1
-                                </Typography>
-                            </Grid>
-                            <Grid item>
-                                <Typography variant="subtitle1" color="inherit">
-                                    1
-                                </Typography>
-                            </Grid>
-                            <Grid item>
-                                <Typography variant="subtitle1" color="inherit">
-                                    1
-                                </Typography>
-                            </Grid>
-                            <Grid item>
-                                <Grid container alignItems="center" justifyContent="space-between">
-                                    <Grid item></Grid>
-                                    <Grid item>
-                                        <GraphSection />
-                                    </Grid>
-                                </Grid>
-                            </Grid>
-                        </Grid>
-                    </Grid>
-                    <Grid item>
-                        <Typography variant="subtitle2" sx={{ color: 'success.dark' }}>
-                            Connected
-                        </Typography>
-                    </Grid>
-                </Grid>
-                <Divider sx={{ my: 1.5 }} />
-                <Grid container direction="column">
-                    <Grid item>
-                        <Grid container alignItems="center" justifyContent="space-between">
-                            <Grid item>
-                                <Typography variant="subtitle1" color="inherit">
-                                    Room 2
-                                </Typography>
-                            </Grid>
-                            <Grid item>
-                                <Typography variant="subtitle1" color="inherit">
-                                    1
-                                </Typography>
-                            </Grid>
-                            <Grid item>
-                                <Typography variant="subtitle1" color="inherit">
-                                    1
-                                </Typography>
-                            </Grid>
-                            <Grid item>
-                                <Typography variant="subtitle1" color="inherit">
-                                    1
-                                </Typography>
-                            </Grid>
-                            <Grid item>
-                                <Typography variant="subtitle1" color="inherit">
-                                    1
-                                </Typography>
-                            </Grid>
-                            <Grid item>
-                                <Grid container alignItems="center" justifyContent="space-between">
-                                    <Grid item></Grid>
-                                    <Grid item>
-                                        <GraphSection />
-                                    </Grid>
-                                </Grid>
-                            </Grid>
-                        </Grid>
-                    </Grid>
-                    <Grid item>
-                        <Typography variant="subtitle2" sx={{ color: theme.palette.success.dark }}>
-                            Connected
-                        </Typography>
-                    </Grid>
-                </Grid>
-                <Divider sx={{ my: 1.5 }} />
-                <Grid container direction="column">
-                    <Grid item>
-                        <Grid container alignItems="center" justifyContent="space-between">
-                            <Grid item>
-                                <Typography variant="subtitle1" color="inherit">
-                                    Room 3
-                                </Typography>
-                            </Grid>
-                            <Grid item>
-                                <Typography variant="subtitle1" color="inherit">
-                                    1
-                                </Typography>
-                            </Grid>
-                            <Grid item>
-                                <Typography variant="subtitle1" color="inherit">
-                                    1
-                                </Typography>
-                            </Grid>
-                            <Grid item>
-                                <Typography variant="subtitle1" color="inherit">
-                                    1
-                                </Typography>
-                            </Grid>
-                            <Grid item>
-                                <Typography variant="subtitle1" color="inherit">
-                                    1
-                                </Typography>
-                            </Grid>
-                            <Grid item>
-                                <Grid container alignItems="center" justifyContent="space-between">
-                                    <Grid item></Grid>
-                                    <Grid item>
-                                        <GraphSection />
-                                    </Grid>
-                                </Grid>
-                            </Grid>
-                        </Grid>
-                    </Grid>
-                    <Grid item>
-                        <Typography variant="subtitle2" sx={{ color: theme.palette.success.dark }}>
-                            Connected
-                        </Typography>
-                    </Grid>
-                </Grid>
-                <Divider sx={{ my: 1.5 }} />
-                <Grid container direction="column">
-                    <Grid item>
-                        <Grid container alignItems="center" justifyContent="space-between">
-                            <Grid item>
-                                <Typography variant="subtitle1" color="inherit">
-                                    Room 4
-                                </Typography>
-                            </Grid>
 
-                            <Grid item>
-                                <Typography variant="subtitle1" color="inherit">
-                                    1
-                                </Typography>
-                            </Grid>
-                            <Grid item>
-                                <Typography variant="subtitle1" color="inherit">
-                                    1
-                                </Typography>
-                            </Grid>
-                            <Grid item>
-                                <Typography variant="subtitle1" color="inherit">
-                                    1
-                                </Typography>
-                            </Grid>
-                            <Grid item>
-                                <Typography variant="subtitle1" color="inherit">
-                                    1
-                                </Typography>
-                            </Grid>
+                {rooms?.map((item) => (
+                    <div key={item.room.room_name}>
+                        <Grid container direction="column">
                             <Grid item>
                                 <Grid container alignItems="center" justifyContent="space-between">
-                                    <Grid item></Grid>
                                     <Grid item>
-                                        <GraphSection />
+                                        <Typography variant="subtitle1" color="inherit">
+                                            {item.room.room_name}
+                                        </Typography>
+                                    </Grid>
+                                    <Grid item>
+                                        <Typography variant="subtitle1" color="inherit">
+                                            {item.room.temperature}
+                                        </Typography>
+                                    </Grid>
+                                    <Grid item>
+                                        <Typography variant="subtitle1" color="inherit">
+                                            {item.room.humidity}
+                                        </Typography>
+                                    </Grid>
+                                    <Grid item>
+                                        <Typography variant="subtitle1" color="inherit">
+                                            {item.room.light}
+                                        </Typography>
+                                    </Grid>
+                                    <Grid item>
+                                        <Typography variant="subtitle1" color="inherit">
+                                            {item.room.pressure / 1000}
+                                        </Typography>
+                                    </Grid>
+                                    <Grid item>
+                                        <Grid container alignItems="center" justifyContent="space-between">
+                                            <Grid item></Grid>
+                                            <Grid item>
+                                                <GraphSection roomName={item.room.room_name} />
+                                            </Grid>
+                                        </Grid>
                                     </Grid>
                                 </Grid>
                             </Grid>
-                        </Grid>
-                    </Grid>
-                    <Grid item>
-                        <Typography variant="subtitle2" sx={{ color: theme.palette.success.dark }}>
-                            Connected
-                        </Typography>
-                    </Grid>
-                </Grid>
-                <Divider sx={{ my: 1.5 }} />
-                <Grid container direction="column">
-                    <Grid item>
-                        <Grid container alignItems="center" justifyContent="space-between">
                             <Grid item>
-                                <Typography variant="subtitle1" color="inherit">
-                                    Room 5
+                                <Typography variant="subtitle2" sx={{ color: 'success.dark' }}>
+                                    Connected
                                 </Typography>
-                            </Grid>
-                            <Grid item>
-                                <Typography variant="subtitle1" color="inherit">
-                                    1
-                                </Typography>
-                            </Grid>
-                            <Grid item>
-                                <Typography variant="subtitle1" color="inherit">
-                                    1
-                                </Typography>
-                            </Grid>
-                            <Grid item>
-                                <Typography variant="subtitle1" color="inherit">
-                                    1
-                                </Typography>
-                            </Grid>
-                            <Grid item>
-                                <Typography variant="subtitle1" color="inherit">
-                                    1
-                                </Typography>
-                            </Grid>
-                            <Grid item>
-                                <Grid container alignItems="center" justifyContent="space-between">
-                                    <Grid item></Grid>
-                                    <Grid item>
-                                        <GraphSection />
-                                    </Grid>
-                                </Grid>
                             </Grid>
                         </Grid>
-                    </Grid>
-                    <Grid item>
-                        <Typography variant="subtitle2" sx={{ color: theme.palette.success.dark }}>
-                            Connected
-                        </Typography>
-                    </Grid>
-                </Grid>
+                        <Divider sx={{ my: 1.5 }} />
+                    </div>
+                ))}
             </Grid>
         </MainCard>
     );

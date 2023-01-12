@@ -1,59 +1,62 @@
-import { useState, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-
-// material-ui
-import { useTheme } from '@mui/material/styles';
+/* eslint-disable */
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import {
     Avatar,
     Box,
-    Button,
     ButtonBase,
-    CardActions,
-    Chip,
     ClickAwayListener,
     Divider,
     Grid,
     Paper,
     Popper,
-    Stack,
     TextField,
     Typography,
-    useMediaQuery
+    useMediaQuery,
 } from '@mui/material';
-
-// third-party
+import { useTheme } from '@mui/material/styles';
+import appService from 'api/services/app.service';
+import { useEffect, useRef, useState } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
-
-// project imports
 import MainCard from 'ui-component/cards/MainCard';
 import Transitions from 'ui-component/extended/Transitions';
+
+import chartData from '../chart-data/line-area-chart';
 import Graphs from './Graphs';
-import TemperatureLineAreaGraph from './TemperatureLineAreaGraph';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 
+// material-ui
+// third-party
+// project imports
 // assets
-import { IconBell } from '@tabler/icons';
-
 // notification status options
 const status = [
     {
-        value: 'all',
+        value: 'temperature',
         label: 'Temperature'
     },
     {
-        value: 'new',
+        value: 'humidity',
         label: 'Humidity'
+    },
+    {
+        value: 'light',
+        label: 'Light'
+    },
+    {
+        value: 'pressure',
+        label: 'Pressure'
     }
 ];
 
 // ==============================|| NOTIFICATION ||============================== //
 
-const GraphSection = () => {
+const GraphSection = ({ roomName }) => {
     const theme = useTheme();
     const matchesXs = useMediaQuery(theme.breakpoints.down('md'));
 
     const [open, setOpen] = useState(false);
-    const [value, setValue] = useState('');
+    const [value, setValue] = useState('temperature');
+    const [chart, setChart] = useState(null);
+    const [room, setRoom] = useState(null);
     /**
      * anchorRef is used on different componets and specifying one type leads to other components throwing an error
      * */
@@ -81,6 +84,24 @@ const GraphSection = () => {
     const handleChange = (event) => {
         if (event?.target.value) setValue(event?.target.value);
     };
+
+    useEffect(() => {
+        const getRoom = async () => {
+            const room = await appService.getRoom(roomName);
+            setRoom(room);
+        };
+
+        getRoom();
+    }, []);
+
+    useEffect(() => {
+        if (room) {
+            const values = Object.values(room).map((item) => item[value]);
+            const newChartData = { ...chartData };
+            newChartData.series[0].data = values;
+            setChart(newChartData);
+        }
+    }, [room, value]);
 
     return (
         <>
@@ -176,7 +197,7 @@ const GraphSection = () => {
                                                         <Divider sx={{ my: 0 }} />
                                                     </Grid>
                                                 </Grid>
-                                                <Graphs />
+                                                {chart && <Graphs chart={chart} />}
                                             </PerfectScrollbar>
                                         </Grid>
                                     </Grid>

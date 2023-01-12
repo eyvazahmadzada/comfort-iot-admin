@@ -1,20 +1,16 @@
+import { Card, Grid, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
+import ApexCharts from 'apexcharts';
 import { useEffect } from 'react';
+import Chart from 'react-apexcharts';
 import { useSelector } from 'react-redux';
 
 // material-ui
-import { useTheme } from '@mui/material/styles';
-import { Card, Grid, Typography } from '@mui/material';
-
 // third-party
-import ApexCharts from 'apexcharts';
-import Chart from 'react-apexcharts';
-
 // project imports
-import chartData from '../chart-data/line-area-chart';
-
 // ===========================|| DASHBOARD DEFAULT - BAJAJ AREA CHART CARD ||=========================== //
 
-const HumidityLineAreaGraph = () => {
+const HumidityLineAreaGraph = ({ chart }) => {
     const theme = useTheme();
     const customization = useSelector((state) => state.customization);
     const { navType } = customization;
@@ -23,7 +19,7 @@ const HumidityLineAreaGraph = () => {
 
     useEffect(() => {
         const newSupportChart = {
-            ...chartData.options,
+            ...chart.options,
             colors: [orangeDark],
             tooltip: {
                 theme: 'light'
@@ -31,6 +27,10 @@ const HumidityLineAreaGraph = () => {
         };
         ApexCharts.exec(`support-chart`, 'updateOptions', newSupportChart);
     }, [navType, orangeDark]);
+
+    useEffect(() => {
+        ApexCharts.exec(`support-chart`, 'updateOptions', chart);
+    }, [chart]);
 
     return (
         <Card sx={{ bgcolor: '#e0f2f1' }}>
@@ -50,7 +50,7 @@ const HumidityLineAreaGraph = () => {
                     </Typography>
                 </Grid>
             </Grid>
-            <Chart {...chartData} />
+            <Chart {...chart} />
         </Card>
     );
 };
